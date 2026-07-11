@@ -2,21 +2,49 @@ name: Android CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: '17'
-          distribution: 'temurin'
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Build with Gradle
-        run: ./gradlew build
+          cache: gradle
+
+      - name: Debug project structure
+        run: |
+          echo "Current directory:"
+          pwd
+          echo ""
+          echo "Root files:"
+          ls -la
+          echo ""
+          echo "Gradle wrapper:"
+          ls -la gradle || true
+          ls -la gradle/wrapper || true
+          echo ""
+          echo "gradlew info:"
+          file gradlew || true
+
+      - name: Fix Gradle Wrapper
+        run: |
+          chmod +x gradlew
+          sed -i 's/\r$//' gradlew
+
+      - name: Verify Gradle Wrapper
+        run: |
+          bash ./gradlew --version
+
+      - name: Build Project
+        run: |
+          bash ./gradlew clean build --stacktrace --info
