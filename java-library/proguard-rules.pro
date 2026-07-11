@@ -1,0 +1,2 @@
+-keep public class io.github.joni.androidcrashmonitor.** { public *; }
+-keepclassmembers class io.github.joni.androidcrashmonitor.** { public *; }
